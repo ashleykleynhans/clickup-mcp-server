@@ -16,5 +16,17 @@ dependencies = [
 [tool.setuptools]
 py-modules = ["server"]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+    "respx>=0.22.0",
+]
+
 [project.scripts]
 clickup-mcp-server = "server:main"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--cov=server --cov-report=term-missing --cov-fail-under=100"

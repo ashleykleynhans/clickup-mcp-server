@@ -1,6 +1,7 @@
 .venv/
 .idea/
 .env
+.coverage
 __pycache__/
 *.pyc
 *.egg-info/
