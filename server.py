@@ -141,6 +141,7 @@ async def get_tasks(
         [
             {
                 "id": t["id"],
+                "custom_id": t.get("custom_id"),
                 "name": t["name"],
                 "status": t.get("status", {}).get("status"),
                 "priority": t.get("priority"),
@@ -168,6 +169,7 @@ async def get_task(task_id: str, include_subtasks: bool = True) -> str:
     return json.dumps(
         {
             "id": data["id"],
+            "custom_id": data.get("custom_id"),
             "name": data["name"],
             "description": data.get("text_content"),
             "status": data.get("status", {}).get("status"),
@@ -243,7 +245,7 @@ async def create_task(
 
     data = await _request("POST", f"/list/{list_id}/task", json=body)
     return json.dumps(
-        {"id": data["id"], "name": data["name"], "url": data.get("url")},
+        {"id": data["id"], "custom_id": data.get("custom_id"), "name": data["name"], "url": data.get("url")},
         indent=2,
     )
 
@@ -289,11 +291,12 @@ async def create_task_with_subtasks(
             f"/list/{list_id}/task",
             json={"name": st_name, "parent": parent_id},
         )
-        created_subtasks.append({"id": st["id"], "name": st["name"]})
+        created_subtasks.append({"id": st["id"], "custom_id": st.get("custom_id"), "name": st["name"]})
 
     return json.dumps(
         {
             "id": parent_id,
+            "custom_id": parent.get("custom_id"),
             "name": parent["name"],
             "url": parent.get("url"),
             "subtasks": created_subtasks,
@@ -349,6 +352,7 @@ async def update_task(
     return json.dumps(
         {
             "id": data["id"],
+            "custom_id": data.get("custom_id"),
             "name": data["name"],
             "status": data.get("status", {}).get("status"),
             "url": data.get("url"),
@@ -369,6 +373,7 @@ async def update_task_status(task_id: str, status: str) -> str:
     return json.dumps(
         {
             "id": data["id"],
+            "custom_id": data.get("custom_id"),
             "name": data["name"],
             "status": data.get("status", {}).get("status"),
         },
@@ -530,6 +535,7 @@ async def search_tasks(team_id: str, query: str) -> str:
         [
             {
                 "id": t["id"],
+                "custom_id": t.get("custom_id"),
                 "name": t["name"],
                 "status": t.get("status", {}).get("status"),
                 "list": t.get("list", {}).get("name"),
