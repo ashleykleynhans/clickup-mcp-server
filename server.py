@@ -34,6 +34,8 @@ async def _request(method: str, path: str, **kwargs: Any) -> dict | list:
             **kwargs,
         )
         resp.raise_for_status()
+        if resp.status_code == 204 or not resp.content:
+            return {}
         return resp.json()
 
 
