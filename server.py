@@ -199,6 +199,7 @@ async def create_task(
     list_id: str,
     name: str,
     description: str | None = None,
+    markdown_content: str | None = None,
     status: str | None = None,
     priority: int | None = None,
     tags: list[str] | None = None,
@@ -213,7 +214,10 @@ async def create_task(
     Args:
         list_id: The list ID to create the task in.
         name: Task name/title.
-        description: Task description (markdown supported).
+        description: Plain-text task description. Markdown syntax is shown
+            literally; use markdown_content for rich formatting instead.
+        markdown_content: Markdown-formatted description rendered as ClickUp
+            rich text. Takes precedence over description when both are given.
         status: Task status string (must match a status in the list).
         priority: Priority: 1=urgent, 2=high, 3=normal, 4=low.
         tags: List of tag names to apply.
@@ -226,6 +230,8 @@ async def create_task(
     body: dict[str, Any] = {"name": name}
     if description is not None:
         body["description"] = description
+    if markdown_content is not None:
+        body["markdown_content"] = markdown_content
     if status is not None:
         body["status"] = status
     if priority is not None:
@@ -256,6 +262,7 @@ async def create_task_with_subtasks(
     name: str,
     subtasks: list[str],
     description: str | None = None,
+    markdown_content: str | None = None,
     status: str | None = None,
     priority: int | None = None,
     tags: list[str] | None = None,
@@ -266,7 +273,10 @@ async def create_task_with_subtasks(
         list_id: The list ID to create the task in.
         name: Parent task name.
         subtasks: List of subtask names to create.
-        description: Parent task description.
+        description: Plain-text parent task description. Markdown syntax is
+            shown literally; use markdown_content for rich formatting instead.
+        markdown_content: Markdown-formatted parent description rendered as
+            ClickUp rich text. Takes precedence over description.
         status: Status for the parent task.
         priority: Priority for the parent task (1=urgent, 2=high, 3=normal, 4=low).
         tags: Tags for the parent task.
@@ -274,6 +284,8 @@ async def create_task_with_subtasks(
     body: dict[str, Any] = {"name": name}
     if description is not None:
         body["description"] = description
+    if markdown_content is not None:
+        body["markdown_content"] = markdown_content
     if status is not None:
         body["status"] = status
     if priority is not None:
@@ -310,6 +322,7 @@ async def update_task(
     task_id: str,
     name: str | None = None,
     description: str | None = None,
+    markdown_content: str | None = None,
     status: str | None = None,
     priority: int | None = None,
     due_date: int | None = None,
@@ -322,7 +335,10 @@ async def update_task(
     Args:
         task_id: The task ID to update.
         name: New task name.
-        description: New description.
+        description: New plain-text description. Markdown syntax is shown
+            literally; use markdown_content for rich formatting instead.
+        markdown_content: New markdown-formatted description rendered as
+            ClickUp rich text. Takes precedence over description.
         status: New status string.
         priority: New priority (1=urgent, 2=high, 3=normal, 4=low).
         due_date: New due date as unix timestamp in milliseconds.
@@ -335,6 +351,8 @@ async def update_task(
         body["name"] = name
     if description is not None:
         body["description"] = description
+    if markdown_content is not None:
+        body["markdown_content"] = markdown_content
     if status is not None:
         body["status"] = status
     if priority is not None:

@@ -181,6 +181,7 @@ async def test_create_task_all_fields(mock_api):
             list_id="l1",
             name="Full Task",
             description="desc",
+            markdown_content="# Heading\n\n- item",
             status="open",
             priority=1,
             tags=["urgent"],
@@ -196,6 +197,7 @@ async def test_create_task_all_fields(mock_api):
     body = json.loads(req.content)
     assert body["name"] == "Full Task"
     assert body["description"] == "desc"
+    assert body["markdown_content"] == "# Heading\n\n- item"
     assert body["status"] == "open"
     assert body["priority"] == 1
     assert body["tags"] == ["urgent"]
@@ -223,6 +225,7 @@ async def test_create_task_with_subtasks(mock_api):
             name="Parent",
             subtasks=["Sub 1", "Sub 2"],
             description="pdesc",
+            markdown_content="**bold parent**",
             status="open",
             priority=2,
             tags=["feature"],
@@ -235,6 +238,7 @@ async def test_create_task_with_subtasks(mock_api):
     # Verify parent body
     parent_body = json.loads(mock_api.calls[0].request.content)
     assert parent_body["description"] == "pdesc"
+    assert parent_body["markdown_content"] == "**bold parent**"
     assert parent_body["status"] == "open"
     assert parent_body["priority"] == 2
     assert parent_body["tags"] == ["feature"]
@@ -265,6 +269,7 @@ async def test_update_task_all_fields(mock_api):
             "t1",
             name="Updated",
             description="new desc",
+            markdown_content="## Updated\n\n1. step",
             status="done",
             priority=3,
             due_date=1700000000000,
@@ -278,6 +283,7 @@ async def test_update_task_all_fields(mock_api):
     body = json.loads(mock_api.calls[0].request.content)
     assert body["name"] == "Updated"
     assert body["description"] == "new desc"
+    assert body["markdown_content"] == "## Updated\n\n1. step"
     assert body["priority"] == 3
     assert body["due_date"] == 1700000000000
     assert body["start_date"] == 1699000000000
