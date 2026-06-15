@@ -53,6 +53,36 @@ async def get_workspaces() -> str:
 
 
 @mcp.tool()
+async def get_members(team_id: str, query: str | None = None) -> str:
+    """List workspace members with their numeric user IDs, usernames and emails.
+
+    Use this to resolve a person's name to the numeric user ID required by the
+    ``assignees`` argument of create_task / update_task.
+
+    Args:
+        team_id: The workspace/team ID.
+        query: Optional case-insensitive substring to filter members by
+            username or email (e.g. "marco").
+    """
+    data = await _request("GET", "/team")
+    needle = (query or "").lower()
+    members: list[dict] = []
+    for team in data.get("teams", []):
+        if str(team.get("id")) != str(team_id):
+            continue
+        for member in team.get("members", []):
+            user = member.get("user", {})
+            username = user.get("username") or ""
+            email = user.get("email") or ""
+            if needle and needle not in username.lower() and needle not in email.lower():
+                continue
+            members.append(
+                {"id": user.get("id"), "username": username, "email": email}
+            )
+    return json.dumps(members, indent=2)
+
+
+@mcp.tool()
 async def get_spaces(team_id: str) -> str:
     """List all spaces in a workspace.
 

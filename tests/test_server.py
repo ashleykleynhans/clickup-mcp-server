@@ -8,6 +8,7 @@ from server import (
     _headers,
     _request,
     get_workspaces,
+    get_members,
     get_spaces,
     get_folders,
     get_lists,
@@ -75,6 +76,45 @@ async def test_get_workspaces(mock_api):
     )
     result = json.loads(await get_workspaces())
     assert result == [{"id": "1", "name": "WS"}]
+
+
+def _members_team():
+    return {
+        "teams": [
+            {"id": "99", "members": [{"user": {"id": 1, "username": "Other User", "email": "other@example.com"}}]},
+            {
+                "id": "9",
+                "members": [
+                    {"user": {"id": 10, "username": "Alice Example", "email": "alice@example.com"}},
+                    {"user": {"id": 20, "username": "Bob Example", "email": "bob@example.com"}},
+                ],
+            },
+        ]
+    }
+
+
+async def test_get_members_all(mock_api):
+    mock_api.get("/team").mock(return_value=httpx.Response(200, json=_members_team()))
+    result = json.loads(await get_members("9"))
+    assert result == [
+        {"id": 10, "username": "Alice Example", "email": "alice@example.com"},
+        {"id": 20, "username": "Bob Example", "email": "bob@example.com"},
+    ]
+
+
+async def test_get_members_query_matches_email(mock_api):
+    mock_api.get("/team").mock(return_value=httpx.Response(200, json=_members_team()))
+    # "alice" matches the email but not the other member, exercising both the
+    # match (append) and the filtered-out (continue) branches.
+    result = json.loads(await get_members("9", "alice"))
+    assert result == [
+        {"id": 10, "username": "Alice Example", "email": "alice@example.com"},
+    ]
+
+
+async def test_get_members_query_no_match(mock_api):
+    mock_api.get("/team").mock(return_value=httpx.Response(200, json=_members_team()))
+    assert json.loads(await get_members("9", "nobody")) == []
 
 
 async def test_get_spaces(mock_api):
