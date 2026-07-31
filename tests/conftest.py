@@ -2,13 +2,27 @@ import httpx
 import pytest
 import respx
 
-from server import CLICKUP_API
+from clickup_mcp.client import CLICKUP_API
 
 
 @pytest.fixture()
 def mock_api():
+    """Mock the ClickUp API at the httpx transport level (via respx)."""
     with respx.mock(base_url=CLICKUP_API) as api:
         yield api
+
+
+@pytest.fixture()
+def no_sleep(monkeypatch):
+    """Patch the retry sleep so retry tests don't actually wait."""
+    calls: list[float] = []
+
+    async def _fake_sleep(delay):
+        calls.append(delay)
+        return None
+
+    monkeypatch.setattr("clickup_mcp.client._async_sleep", _fake_sleep)
+    return calls
 
 
 def mock_task(
@@ -47,3 +61,4 @@ def mock_task(
     if list_name is not None:
         t["list"] = {"name": list_name}
     return t
+
