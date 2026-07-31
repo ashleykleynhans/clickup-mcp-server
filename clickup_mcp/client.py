@@ -11,8 +11,14 @@ import os
 from typing import Any
 
 import httpx
+from dotenv import load_dotenv
 
 from .errors import ClickUpError
+
+# Load CLICKUP_API_TOKEN (and any other vars) from a .env file BEFORE reading
+# the token below. Without this, a token placed in .env is never seen when the
+# spawning process (e.g. Claude Code) doesn't already export it in the env.
+load_dotenv()
 
 CLICKUP_API = "https://api.clickup.com/api/v2"
 API_TOKEN = os.getenv("CLICKUP_API_TOKEN", "")
